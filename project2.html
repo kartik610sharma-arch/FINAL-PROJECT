@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>VerifyMe - KYC Onboarding</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+<style>
+    /* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#eef4ff,#dfefff);
+    min-height:100vh;
+}
+
+.container{
+    max-width:900px;
+}
+
+.card{
+    border-radius:20px;
+    overflow:hidden;
+    animation:fadeIn .5s ease;
+}
+
+.card-body{
+    background:#fff;
+}
+
+h2{
+    font-weight:700;
+}
+
+.progress{
+    border-radius:20px;
+    background:#e8edf8;
+}
+
+.progress-bar{
+    transition:.4s;
+}
+
+.form-control,
+.form-select,
+.form-range{
+    border-radius:12px;
+}
+
+.form-control:focus{
+    border-color:#0d6efd;
+    box-shadow:0 0 0 .2rem rgba(13,110,253,.2);
+}
+
+textarea{
+    resize:none;
+}
+
+.input-group-text{
+    border-radius:12px 0 0 12px;
+}
+
+.btn{
+    border-radius:12px;
+    padding:10px 25px;
+    transition:.3s;
+    font-weight:600;
+}
+
+.btn:hover{
+    transform:translateY(-2px);
+}
+
+#preview{
+    width:100%;
+    object-fit:cover;
+    border-radius:15px;
+    border:2px dashed #0d6efd;
+    padding:5px;
+}
+
+.form-check-input:checked{
+    background:#0d6efd;
+    border-color:#0d6efd;
+}
+
+.modal-content{
+    border-radius:20px;
+}
+
+.modal-body h2{
+    font-size:60px;
+}
+
+#incomeValue{
+    color:#0d6efd;
+    font-weight:700;
+    margin-top:10px;
+}
+
+.invalid{
+    border:2px solid red !important;
+}
+
+.valid{
+    border:2px solid green !important;
+}
+
+.step-title{
+    font-size:24px;
+    font-weight:600;
+    margin-bottom:20px;
+}
+
+.shadow-lg{
+    box-shadow:0 20px 40px rgba(0,0,0,.15)!important;
+}
+
+@keyframes fadeIn{
+
+from{
+opacity:0;
+transform:translateY(20px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+@media(max-width:768px){
+
+.card-body{
+padding:25px;
+}
+
+.btn{
+width:100%;
+margin-top:10px;
+}
+
+.d-flex{
+flex-direction:column;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="container py-5">
+
+<div class="card shadow-lg border-0">
+
+<div class="card-body p-5">
+
+<div class="text-center mb-4">
+
+<h2 class="fw-bold text-primary">
+VerifyMe
+</h2>
+
+<p class="text-muted">
+Fintech KYC & Customer Onboarding
+</p>
+
+</div>
+
+<!-- Progress -->
+
+<div class="progress mb-5" style="height:12px;">
+
+<div class="progress-bar bg-primary"
+
+id="progressBar"
+
+style="width:33%">
+</div>
+
+</div>
+
+<!-- STEP 1 -->
+
+<div id="step1">
+
+<h4 class="mb-4">
+Identity Information
+</h4>
+
+<div class="form-floating mb-3">
+
+<input
+type="text"
+class="form-control"
+id="name"
+placeholder="Name">
+
+<label>
+Name
+</label>
+
+</div>
+
+<div class="form-floating mb-3">
+
+<input
+type="email"
+class="form-control"
+id="email"
+placeholder="Email">
+
+<label>Email</label>
+
+</div>
+
+<div class="input-group mb-3">
+
+<span class="input-group-text">
++91
+</span>
+
+<input
+type="text"
+class="form-control"
+maxlength="10"
+id="phone"
+placeholder="Phone Number">
+
+</div>
+
+<div class="form-floating mb-4">
+
+<input
+type="text"
+class="form-control"
+id="pan"
+placeholder="PAN">
+
+<label>
+PAN Number
+</label>
+
+</div>
+
+<div class="text-end">
+
+<button
+class="btn btn-primary"
+onclick="nextStep(2)">
+Next →
+</button>
+
+</div>
+
+</div>
+
+<!-- STEP 2 -->
+
+<div id="step2" class="d-none">
+
+<h4 class="mb-4">
+Address & Income
+</h4>
+
+<div class="form-floating mb-3">
+
+<textarea
+class="form-control"
+id="address"
+style="height:120px">
+</textarea>
+
+<label>
+Address
+</label>
+
+</div>
+
+<label class="fw-bold">
+Income
+</label>
+
+<input
+
+type="range"
+
+class="form-range"
+
+min="10000"
+
+max="500000"
+
+step="10000"
+
+id="income"
+
+value="50000"
+
+oninput="incomeValue.innerHTML='₹ '+this.value">
+
+<h5 id="incomeValue">
+₹ 50000
+</h5>
+
+<div class="d-flex justify-content-between mt-4">
+
+<button
+class="btn btn-secondary"
+onclick="previousStep(1)">
+← Previous
+</button>
+
+<button
+class="btn btn-primary"
+onclick="nextStep(3)">
+Next →
+</button>
+
+</div>
+
+</div>
+
+<!-- STEP 3 -->
+
+<div id="step3" class="d-none">
+
+<h4 class="mb-4">
+Documents
+</h4>
+
+<input
+
+type="file"
+
+class="form-control mb-3"
+
+id="document"
+
+accept="image/*"
+
+onchange="previewImage(event)">
+
+<img
+
+id="preview"
+
+class="img-fluid rounded mb-3 d-none"
+
+style="max-height:220px;">
+
+<div class="mb-3">
+
+<label class="fw-bold">
+Document Type
+</label>
+
+<div class="form-check">
+
+<input
+class="form-check-input"
+
+type="radio"
+
+name="doc"
+
+checked>
+
+<label class="form-check-label">
+
+Aadhar
+
+</label>
+
+</div>
+
+<div class="form-check">
+
+<input
+class="form-check-input"
+
+type="radio"
+
+name="doc">
+
+<label class="form-check-label">
+
+PAN
+
+</label>
+
+</div>
+
+<div class="form-check">
+
+<input
+class="form-check-input"
+
+type="radio"
+
+name="doc">
+
+<label class="form-check-label">
+
+Passport
+
+</label>
+
+</div>
+
+</div>
+
+<div class="form-check mb-3">
+
+<input
+
+class="form-check-input"
+
+type="checkbox"
+
+id="agree">
+
+<label class="form-check-label">
+
+I agree with Terms & Conditions
+
+</label>
+
+</div>
+
+<div class="form-check form-switch mb-4">
+
+<input
+
+class="form-check-input"
+
+type="checkbox"
+
+id="marketing">
+
+<label class="form-check-label">
+
+Receive Marketing Emails
+
+</label>
+
+</div>
+
+<div class="d-flex justify-content-between">
+
+<button
+class="btn btn-secondary"
+onclick="previousStep(2)">
+← Previous
+</button>
+
+<button
+class="btn btn-success"
+onclick="submitForm()">
+
+Submit
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Success Modal -->
+
+<div
+class="modal fade"
+id="successModal">
+
+<div class="modal-dialog">
+
+<div class="modal-content">
+
+<div class="modal-body text-center p-5">
+
+<h2 class="text-success">
+✔
+</h2>
+
+<h3>
+KYC Submitted Successfully
+</h3>
+
+<p>
+Your verification request has been received.
+</p>
+
+<button
+
+class="btn btn-primary"
+
+data-bs-dismiss="modal">
+
+Close
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PulseBoard</title>
+
+<style>  
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#f4f6fa;
+    display:flex;
+}
+
+.sidebar{
+    width:250px;
+    background:#0f172a;
+    color:white;
+    height:100vh;
+    padding:20px;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:30px;
+}
+
+.nav a{
+    display:block;
+    color:white;
+    text-decoration:none;
+    padding:12px;
+    margin:8px 0;
+    border-radius:8px;
+}
+
+.nav a:hover,
+.active{
+    background:#3b82f6;
+}
+
+.main{
+    flex:1;
+    padding:20px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+button{
+    padding:10px 20px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+.percent{
+    font-size:28px;
+    font-weight:bold;
+}
+
+.progress{
+    height:10px;
+    background:#ddd;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+.bar{
+    height:100%;
+    border-radius:10px;
+}
+
+.green{background:green;}
+.orange{background:orange;}
+.red{background:red;}
+
+table{
+    width:100%;
+    margin-top:20px;
+    border-collapse:collapse;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+th,td{
+    padding:15px;
+    border-bottom:1px solid #eee;
+}
+
+.badge{
+    padding:5px 10px;
+    border-radius:20px;
+    color:white;
+    font-size:12px;
+}
+
+.operational{background:green;}
+.degraded{background:orange;}
+.down{background:red;}
+
+.modal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.5);
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-content{
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    width:350px;
+}
+
+.close{
+    float:right;
+    cursor:pointer;
+    font-size:22px;
+}
+
+@media(max-width:768px){
+    .sidebar{
+        width:180px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <div class="logo">PulseBoard</div>
+
+    <div class="nav">
+        <a href="#" class="active">Overview</a>
+        <a href="#">Services</a>
+        <a href="#">Alerts</a>
+        <a href="#">Logs</a>
+        <a href="#">Settings</a>
+    </div>
+</div>
+
+<div class="main">
+
+    <div class="header">
+        <h2>Infrastructure Overview</h2>
+        <button onclick="refreshData()">Refresh</button>
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <h4>CPU</h4>
+            <div class="percent" id="cpu">72%</div>
+            <div class="progress">
+                <div class="bar orange" style="width:72%"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>Memory</h4>
+            <div class="percent" id="memory">58%</div>
+            <div class="progress">
+                <div class="bar green" style="width:58%"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>Disk</h4>
+            <div class="percent" id="disk">88%</div>
+            <div class="progress">
+                <div class="bar red" style="width:88%"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>Network</h4>
+            <div class="percent" id="network">34%</div>
+            <div class="progress">
+                <div class="bar green" style="width:34%"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <table>
+        <tr>
+            <th>Service</th>
+            <th>Response</th>
+            <th>Status</th>
+        </tr>
+
+        <tr onclick="showModal('API Gateway','42ms','Operational')">
+            <td>API Gateway</td>
+            <td>42 ms</td>
+            <td><span class="badge operational">Operational</span></td>
+        </tr>
+
+        <tr onclick="showModal('Payments','310ms','Degraded')">
+            <td>Payments</td>
+            <td>310 ms</td>
+            <td><span class="badge degraded">Degraded</span></td>
+        </tr>
+
+        <tr onclick="showModal('DB Primary','Timeout','Down')">
+            <td>DB Primary</td>
+            <td>Timeout</td>
+            <td><span class="badge down">Down</span></td>
+        </tr>
+
+    </table>
+
+</div>
+
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3 id="serviceName"></h3>
+        <p id="serviceResponse"></p>
+        <p id="serviceStatus"></p>
+    </div>
+</div>
+
+<script>
+
+function refreshData(){
+
+    document.getElementById("cpu").innerText =
+    Math.floor(Math.random()*100)+"%";
+
+    document.getElementById("memory").innerText =
+    Math.floor(Math.random()*100)+"%";
+
+    document.getElementById("disk").innerText =
+    Math.floor(Math.random()*100)+"%";
+
+    document.getElementById("network").innerText =
+    Math.floor(Math.random()*100)+"%";
+}
+
+function showModal(name,response,status){
+    document.getElementById("modal").style.display="flex";
+
+    document.getElementById("serviceName").innerText=
+    "Service : "+name;
+
+    document.getElementById("serviceResponse").innerText=
+    "Response : "+response;
+
+    document.getElementById("serviceStatus").innerText=
+    "Status : "+status;
+}
+
+function closeModal(){
+    document.getElementById("modal").style.display="none";
+}
+
+</script>
+
+</body>
+</html>
+
+
